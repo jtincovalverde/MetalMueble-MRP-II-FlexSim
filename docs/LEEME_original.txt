@@ -1,0 +1,18 @@
+METALMUEBLE V23 - COLAS EN CUADRICULA
+
+1. Cierra FlexSim.
+2. Ejecuta 01_ABRIR_METALMUEBLE_V23.bat.
+3. Pulsa EJECUTAR una sola vez.
+4. En los primeros 25.14 s simulados se liberan las 420 piezas.
+5. Usa Avanzar rapidamente para observar el avance y la acumulacion.
+6. No cambies ninguna propiedad del modelo.
+
+V23 conserva sin cambios el flujo, las 420 piezas iniciales, las 40 h, los
+tiempos, las capacidades, las conexiones, los triggers, el batching y los KPI
+de V22. El unico cambio es visual: los bloques ya no forman una sola torre.
+
+Tras la liberacion inicial deben existir aproximadamente 418 piezas en Cola_Corte
+y 2 en Corte. Cada cola distribuye sus piezas en filas y columnas sobre su area;
+cuando una capa se llena, continua en una nueva capa. Producto_Terminado usa la
+misma distribucion. No se agregan bloques falsos: cada bloque visible corresponde
+a una pieza real.
