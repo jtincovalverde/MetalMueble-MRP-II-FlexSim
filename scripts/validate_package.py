@@ -3,7 +3,7 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "MetalMueble_V23_COLAS_EN_CUADRICULA.txt"
-LAUNCHER = ROOT / "01_ABRIR_METALMUEBLE_V23.bat"
+LAUNCHER = ROOT / "iniciar_metalmueble.bat"
 
 
 def require(condition: bool, message: str) -> None:
