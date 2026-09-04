@@ -2,9 +2,9 @@
 setlocal EnableExtensions
 TITLE MetalMueble - FlexSim 2027
 
-set "SAFE_DIR=%PUBLIC%\FlexSimAuto"
-if not exist "%SAFE_DIR%" mkdir "%SAFE_DIR%"
-copy /B /Y "%~dp0MetalMueble_V23_COLAS_EN_CUADRICULA.txt" "%SAFE_DIR%\MetalMuebleV23.txt" >nul
+set "WORK_DIR=%PUBLIC%\MetalMueble"
+if not exist "%WORK_DIR%" mkdir "%WORK_DIR%"
+copy /B /Y "%~dp0modelo_metalmueble.txt" "%WORK_DIR%\modelo_metalmueble.txt" >nul
 
 set "FLEX="
 for %%F in (
@@ -19,13 +19,13 @@ if not defined FLEX (
   exit /b 1
 )
 
-set "SEED=%SAFE_DIR%\FlexSimSeed.fsm"
-if not exist "%SEED%" (
+set "BASE_MODEL=%WORK_DIR%\modelo_base.fsm"
+if not exist "%BASE_MODEL%" (
   echo Preparando el modelo base de FlexSim...
-  powershell -NoProfile -ExecutionPolicy Bypass -Command "$ProgressPreference='SilentlyContinue'; Invoke-WebRequest -UseBasicParsing 'https://raw.githubusercontent.com/flexsim/ai-course-materials/main/HelloWorld/HelloWorld.fsm' -OutFile '%SEED%'"
+  powershell -NoProfile -ExecutionPolicy Bypass -Command "$ProgressPreference='SilentlyContinue'; Invoke-WebRequest -UseBasicParsing 'https://raw.githubusercontent.com/flexsim/ai-course-materials/main/HelloWorld/HelloWorld.fsm' -OutFile '%BASE_MODEL%'"
 )
-if not exist "%SEED%" (
-  echo [ERROR] No se pudo obtener FlexSimSeed.fsm.
+if not exist "%BASE_MODEL%" (
+  echo [ERROR] No se pudo preparar el modelo base de FlexSim.
   pause
   exit /b 2
 )
@@ -38,5 +38,5 @@ echo Preparando el modelo de 420 piezas en FlexSim 2027...
 echo.
 echo Cuando FlexSim abra, pulsa Ejecutar una sola vez.
 echo.
-start "" "%FLEX%" "%SEED%" /maintenance disablemsg_runscript /scriptpath "%SAFE_DIR%\MetalMuebleV23.txt"
+start "" "%FLEX%" "%BASE_MODEL%" /maintenance disablemsg_runscript /scriptpath "%WORK_DIR%\modelo_metalmueble.txt"
 exit /b 0
