@@ -1,0 +1,20 @@
+name: Validacion del proyecto
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  validacion-estatica:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Validar estructura y logica documentada
+        run: python scripts/validar_proyecto.py
