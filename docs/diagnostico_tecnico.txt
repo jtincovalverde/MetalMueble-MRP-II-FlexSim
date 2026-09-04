@@ -1,0 +1,20 @@
+DIAGNOSTICO TECNICO DEL MODELO
+
+El modelo representa un lote inicial de 420 piezas que recorre cuatro etapas:
+Corte, Soldadura, Ensamble y Acabado.
+
+VISUALIZACION DE COLAS
+Las colas usan ItemPlacement = Stack Inside Queue para distribuir las piezas en
+filas, columnas y capas dentro del area visible de cada Queue. Show Contents se
+mantiene activo y StackBaseZ = 1.2 coloca la primera capa sobre la geometria.
+
+LOGICA DEL MODELO
+- La primera pieza se libera en t=0 y las siguientes cada 0.06 s.
+- OnExit detiene la creacion despues de la pieza numero 420.
+- OnReset restaura el intervalo para repetir la simulacion.
+- Se mantienen los cuatro tiempos de proceso y MaxContent = 2 por Processor.
+- Producto_Terminado retiene las piezas mediante batching durante el horizonte.
+- El horizonte de simulacion es de 40 horas.
+- Los KPI muestran terminados, cola de Soldadura, espera, throughput y cuello de botella.
+
+No se manipulan Arrival1, Arrival Schedule, creationtrigger ni FlowItemBin.
