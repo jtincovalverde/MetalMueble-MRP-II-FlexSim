@@ -1,0 +1,302 @@
+/*
+ METALMUEBLE MRP II - FlexSim 2027 Education - V23
+ BASE: V22 (lote inicial de 420 y flujo confirmados por el usuario)
+
+ UNICO CAMBIO SOBRE V22 (EXCLUSIVAMENTE VISUAL):
+ - Distribuir los bloques en filas, columnas y capas dentro de cada Queue.
+ - Evitar las torres verticales de una sola fila.
+
+ IMPORTANTE:
+ - Se reutilizan EXACTAMENTE Source1 y Queue1 del seed que ya funcionan.
+ - No se cambia la arquitectura Corte -> Soldadura -> Ensamble -> Acabado.
+ - Se conservan exactamente las 420 piezas, tiempos, capacidades, KPI y triggers.
+ - No se usan tablas internas Arrival Schedule ni creationtrigger.
+ - Se usa el trigger publico OnExit del Source con encabezado explicito.
+*/
+
+print("=== METALMUEBLE V23 - COLAS EN CUADRICULA ===");
+
+// -----------------------------------------------------------------------------
+// A) REUTILIZAR LOS OBJETOS DEL SEED QUE YA FUNCIONARON EN V17
+// -----------------------------------------------------------------------------
+Object materiaPrima = Model.find("Source1");
+Object colaCorte = Model.find("Queue1");
+
+materiaPrima.name = "Materia_Prima";
+colaCorte.name = "Cola_Corte";
+
+// Desconectar Queue1 de Processor1/2/3 sin tocar la conexion Source1 -> Queue1.
+while (colaCorte.outObjects.length > 0) {
+    Object viejoDestino = colaCorte.outObjects[1];
+    contextdragconnection(colaCorte, viejoDestino, "Q");
+}
+
+// -----------------------------------------------------------------------------
+// B) CREAR LA MISMA LINEA QUE FUNCIONO EN V17
+// -----------------------------------------------------------------------------
+treenode queueTemplate = library().find("?Queue");
+treenode processorTemplate = library().find("?Processor");
+treenode sinkTemplate = library().find("?Sink");
+
+Object corte          = createinstance(processorTemplate, model());
+Object colaSoldadura  = createinstance(queueTemplate, model());
+Object soldadura      = createinstance(processorTemplate, model());
+Object colaEnsamble   = createinstance(queueTemplate, model());
+Object ensamble       = createinstance(processorTemplate, model());
+Object colaAcabado    = createinstance(queueTemplate, model());
+Object acabado        = createinstance(processorTemplate, model());
+
+// V20: misma Queue de almacen; SOLO cambia la colocacion visual de sus items.
+// A diferencia de V18, SI tiene un Sink aguas abajo. La Queue usa batching con
+// lote objetivo 421 y espera maxima 0, por lo que acepta y RETIENE todas las
+// piezas terminadas durante el horizonte (nunca llega a 421 porque solo entran 420).
+Object productoTerminado = createinstance(queueTemplate, model());
+Object sinkFinal = createinstance(sinkTemplate, model());
+
+switch_destroyonreset(corte, 0);
+switch_destroyonreset(colaSoldadura, 0);
+switch_destroyonreset(soldadura, 0);
+switch_destroyonreset(colaEnsamble, 0);
+switch_destroyonreset(ensamble, 0);
+switch_destroyonreset(colaAcabado, 0);
+switch_destroyonreset(acabado, 0);
+switch_destroyonreset(productoTerminado, 0);
+switch_destroyonreset(sinkFinal, 0);
+
+corte.name = "Corte";
+colaSoldadura.name = "Cola_Soldadura";
+soldadura.name = "Soldadura";
+colaEnsamble.name = "Cola_Ensamble";
+ensamble.name = "Ensamble";
+colaAcabado.name = "Cola_Acabado";
+acabado.name = "Acabado";
+productoTerminado.name = "Producto_Terminado";
+sinkFinal.name = "Sink_Final_Oculto";
+
+// -----------------------------------------------------------------------------
+// C) POSICIONES - UNA SOLA LINEA PRINCIPAL
+// -----------------------------------------------------------------------------
+materiaPrima.setLocation(0, 0, 0);
+colaCorte.setLocation(6, 0, 0);
+corte.setLocation(12, 0, 0);
+colaSoldadura.setLocation(18, 0, 0);
+soldadura.setLocation(24, 0, 0);
+colaEnsamble.setLocation(30, 0, 0);
+ensamble.setLocation(36, 0, 0);
+colaAcabado.setLocation(42, 0, 0);
+acabado.setLocation(48, 0, 0);
+productoTerminado.setLocation(54, 0, 0);
+
+materiaPrima.setSize(3, 3, 3);
+colaCorte.setSize(4, 3, 2);
+corte.setSize(3, 3, 3);
+colaSoldadura.setSize(4, 3, 2);
+soldadura.setSize(3, 3, 3);
+colaEnsamble.setSize(4, 3, 2);
+ensamble.setSize(3, 3, 3);
+colaAcabado.setSize(4, 3, 2);
+acabado.setSize(3, 3, 3);
+productoTerminado.setSize(5, 4, 2);
+
+// El Sink queda fuera de la escena. Existe solo para dar una salida valida a
+// Producto_Terminado; el batching de la Queue impide que las piezas salgan.
+sinkFinal.setLocation(-20, -20, 0);
+sinkFinal.setSize(0.02, 0.02, 0.02);
+
+// -----------------------------------------------------------------------------
+// D) CONEXIONES - MISMA ARQUITECTURA V17, SOLO TERMINA EN ALMACEN VISIBLE
+// -----------------------------------------------------------------------------
+contextdragconnection(colaCorte, corte, "A");
+contextdragconnection(corte, colaSoldadura, "A");
+contextdragconnection(colaSoldadura, soldadura, "A");
+contextdragconnection(soldadura, colaEnsamble, "A");
+contextdragconnection(colaEnsamble, ensamble, "A");
+contextdragconnection(ensamble, colaAcabado, "A");
+contextdragconnection(colaAcabado, acabado, "A");
+contextdragconnection(acabado, productoTerminado, "A");
+contextdragconnection(productoTerminado, sinkFinal, "A");
+
+colaCorte.setProperty("SendToPort", 0);
+corte.setProperty("SendToPort", 0);
+colaSoldadura.setProperty("SendToPort", 0);
+soldadura.setProperty("SendToPort", 0);
+colaEnsamble.setProperty("SendToPort", 0);
+ensamble.setProperty("SendToPort", 0);
+colaAcabado.setProperty("SendToPort", 0);
+acabado.setProperty("SendToPort", 0);
+
+// -----------------------------------------------------------------------------
+// E) CAPACIDADES Y TIEMPOS - SIN CAMBIOS RESPECTO A V17
+// -----------------------------------------------------------------------------
+colaCorte.setProperty("MaxContent", 1000);
+colaSoldadura.setProperty("MaxContent", 1000);
+colaEnsamble.setProperty("MaxContent", 1000);
+colaAcabado.setProperty("MaxContent", 1000);
+productoTerminado.setProperty("MaxContent", 1000);
+
+// V23: correccion exclusivamente visual para las cinco colas.
+// switch_hidecontents(..., 0) fuerza Show Contents. Stack Inside Queue reparte
+// las piezas en filas, columnas y capas dentro del area disponible de la Queue.
+// StackBaseZ conserva la primera capa sobre la geometria de la Queue.
+// No se alteran conexiones, tiempos, capacidades, batching ni estadisticas.
+switch_hidecontents(colaCorte, 0);
+switch_hidecontents(colaSoldadura, 0);
+switch_hidecontents(colaEnsamble, 0);
+switch_hidecontents(colaAcabado, 0);
+switch_hidecontents(productoTerminado, 0);
+
+colaCorte.setProperty("ItemPlacement", "Stack Inside Queue");
+colaSoldadura.setProperty("ItemPlacement", "Stack Inside Queue");
+colaEnsamble.setProperty("ItemPlacement", "Stack Inside Queue");
+colaAcabado.setProperty("ItemPlacement", "Stack Inside Queue");
+
+colaCorte.setProperty("StackBaseZ", 1.2);
+colaSoldadura.setProperty("StackBaseZ", 1.2);
+colaEnsamble.setProperty("StackBaseZ", 1.2);
+colaAcabado.setProperty("StackBaseZ", 1.2);
+
+// Se conserva exactamente la retencion de V19 (ya comprobada: KPI Content > 0).
+productoTerminado.setProperty("DoBatching", 1);
+productoTerminado.setProperty("BatchSize", 421);
+productoTerminado.setProperty("MaxBatchTime", [0, "s"]);
+productoTerminado.setProperty("FlushContent", 0);
+productoTerminado.setProperty("ItemPlacement", "Stack Inside Queue");
+productoTerminado.setProperty("StackBaseZ", 1.2);
+
+corte.setProperty("MaxContent", 2);
+soldadura.setProperty("MaxContent", 2);
+ensamble.setProperty("MaxContent", 2);
+acabado.setProperty("MaxContent", 2);
+
+corte.setProperty("SetupTime", [0, "min"]);
+soldadura.setProperty("SetupTime", [0, "min"]);
+ensamble.setProperty("SetupTime", [0, "min"]);
+acabado.setProperty("SetupTime", [0, "min"]);
+
+corte.setProperty("ProcessTime", [5.6975772765, "min"]);
+soldadura.setProperty("ProcessTime", [13.4722614342, "min"]);
+ensamble.setProperty("ProcessTime", [8.5045948204, "min"]);
+acabado.setProperty("ProcessTime", [10.4761904762, "min"]);
+
+corte.setProperty("AnimateItems", 1);
+soldadura.setProperty("AnimateItems", 1);
+ensamble.setProperty("AnimateItems", 1);
+acabado.setProperty("AnimateItems", 1);
+
+// -----------------------------------------------------------------------------
+// F) LOTE INICIAL - EXACTAMENTE 420 PIEZAS EN 25.14 SEGUNDOS
+// -----------------------------------------------------------------------------
+// Se conserva el Source ORIGINAL del seed. La pieza 1 llega en t=0 y las
+// siguientes se liberan cada 0.06 s. La pieza 420 sale aproximadamente en
+// t=25.14 s, por lo que el lote queda acumulado fisicamente en Cola_Corte.
+//
+// OnExit se evalua antes de confirmar la salida actual. Por eso output=419
+// identifica la salida de la pieza 420. En ese instante se coloca la proxima
+// llegada fuera del horizonte y se destruye cualquier temporizador ya creado.
+// OnReset restaura el intervalo para que Reiniciar + Ejecutar reproduzca el lote.
+materiaPrima.setProperty("ArrivalStyle", "Inter-Arrival Time");
+materiaPrima.setProperty("TimeZeroArrival", 1);
+materiaPrima.setProperty("InterArrivalTime", 0.06);
+
+string sourceResetCode =
+    "Object current = ownerobject(c);\n"
+    + "current.setProperty(\"InterArrivalTime\", 0.06);\n";
+materiaPrima.setProperty("Triggers.OnReset", sourceResetCode);
+
+string sourceExitCode =
+    "Object current = ownerobject(c);\n"
+    + "Object item = param(1);\n"
+    + "int port = param(2);\n"
+    + "if (current.stats.output.value >= 419) {\n"
+    + "    current.setProperty(\"InterArrivalTime\", hours(1000));\n"
+    + "    destroyeventsofobject(current);\n"
+    + "}\n";
+materiaPrima.setProperty("Triggers.OnExit", sourceExitCode);
+
+// -----------------------------------------------------------------------------
+// G) CAMBIO 2 - HORIZONTE EXACTO: 40 HORAS
+// -----------------------------------------------------------------------------
+stoptime(hours(40));
+
+// -----------------------------------------------------------------------------
+// H) APARTAR LOS OBJETOS SOBRANTES DEL SEED - IGUAL QUE V17
+// -----------------------------------------------------------------------------
+Object seedP1 = Model.find("Processor1");
+Object seedP2 = Model.find("Processor2");
+Object seedP3 = Model.find("Processor3");
+Object seedCorrect = Model.find("Correct");
+Object seedIncorrect = Model.find("Incorrect");
+
+seedP1.setLocation(-20, -20, 0);
+seedP2.setLocation(-20, -20, 0);
+seedP3.setLocation(-20, -20, 0);
+seedCorrect.setLocation(-20, -20, 0);
+seedIncorrect.setLocation(-20, -20, 0);
+
+seedP1.setSize(0.02, 0.02, 0.02);
+seedP2.setSize(0.02, 0.02, 0.02);
+seedP3.setSize(0.02, 0.02, 0.02);
+seedCorrect.setSize(0.02, 0.02, 0.02);
+seedIncorrect.setSize(0.02, 0.02, 0.02);
+
+// -----------------------------------------------------------------------------
+// I) KPIs VISUALES - SIN CAMBIOS RESPECTO A V19
+// -----------------------------------------------------------------------------
+// Los KPIs de V19 ya funcionan. V20 no modifica su logica.
+treenode visualTextTemplate = node("MAIN:/project/exec/globals/visuallibrary/Text");
+
+Object kpiTerminados  = createcopy(visualTextTemplate, model());
+Object kpiColaSold    = createcopy(visualTextTemplate, model());
+Object kpiEsperaSold  = createcopy(visualTextTemplate, model());
+Object kpiThroughput  = createcopy(visualTextTemplate, model());
+Object kpiBottleneck  = createcopy(visualTextTemplate, model());
+
+switch_destroyonreset(kpiTerminados, 0);
+switch_destroyonreset(kpiColaSold, 0);
+switch_destroyonreset(kpiEsperaSold, 0);
+switch_destroyonreset(kpiThroughput, 0);
+switch_destroyonreset(kpiBottleneck, 0);
+
+kpiTerminados.name = "KPI_Terminados";
+kpiColaSold.name = "KPI_Cola_Soldadura";
+kpiEsperaSold.name = "KPI_Espera_Soldadura";
+kpiThroughput.name = "KPI_Throughput";
+kpiBottleneck.name = "KPI_Cuello_Botella";
+
+// Se colocan elevados y mirando hacia la camara; no se rotan sobre el piso.
+kpiTerminados.setLocation(8, -7, 2.5);
+kpiColaSold.setLocation(20, -7, 2.5);
+kpiEsperaSold.setLocation(32, -7, 2.5);
+kpiThroughput.setLocation(44, -7, 2.5);
+kpiBottleneck.setLocation(26, -11, 2.5);
+
+kpiTerminados.setSize(8, 1.5, 1);
+kpiColaSold.setSize(8, 1.5, 1);
+kpiEsperaSold.setSize(11, 1.5, 1);
+kpiThroughput.setSize(9, 1.5, 1);
+kpiBottleneck.setSize(13, 1.7, 1);
+
+kpiTerminados.setProperty("TextSize", 0.55);
+kpiColaSold.setProperty("TextSize", 0.55);
+kpiEsperaSold.setProperty("TextSize", 0.55);
+kpiThroughput.setProperty("TextSize", 0.55);
+kpiBottleneck.setProperty("TextSize", 0.65);
+
+kpiTerminados.setProperty("TextThickness", 0.02);
+kpiColaSold.setProperty("TextThickness", 0.02);
+kpiEsperaSold.setProperty("TextThickness", 0.02);
+kpiThroughput.setProperty("TextThickness", 0.02);
+kpiBottleneck.setProperty("TextThickness", 0.02);
+
+// TextDisplay es Code String. Estas expresiones se recalculan durante el run.
+kpiTerminados.setProperty("TextDisplay", "\"Terminados: \" + string.fromNum(getstat(Model.find(\"Producto_Terminado\"), \"Content\", STAT_CURRENT), 0) + \" / 420\"");
+kpiColaSold.setProperty("TextDisplay", "\"Cola Soldadura: \" + string.fromNum(getstat(Model.find(\"Cola_Soldadura\"), \"Content\", STAT_CURRENT), 0)");
+kpiEsperaSold.setProperty("TextDisplay", "\"Espera prom. Soldadura: \" + string.fromNum(getstat(Model.find(\"Cola_Soldadura\"), \"Staytime\", STAT_AVERAGE) / minutes(1), 2) + \" min\"");
+kpiThroughput.setProperty("TextDisplay", "\"Throughput: \" + string.fromNum(time() > 0 ? getstat(Model.find(\"Producto_Terminado\"), \"Input\", STAT_CURRENT) / (time() / hours(1)) : 0, 2) + \" unid/h\"");
+kpiBottleneck.setProperty("TextDisplay", "\"CUELLO DE BOTELLA: SOLDADURA\"");
+
+updatestates();
+
+print("=== V23 LISTO ===");
+print("V23 conserva la logica V22 y distribuye los bloques dentro de las cinco colas.");
+print("Pulsa EJECUTAR una sola vez.");
