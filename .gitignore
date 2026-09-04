@@ -1,0 +1,13 @@
+# FlexSim generated / local files
+*.fsm
+*.bak
+*.tmp
+*.log
+
+# Windows
+Thumbs.db
+Desktop.ini
+
+# Python validation cache
+__pycache__/
+*.pyc
