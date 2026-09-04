@@ -51,7 +51,7 @@ The expected operational behavior of the case is an accumulation before **Soldad
 
 ```text
 MetalMueble-MRP-II-FlexSim/
-├── 01_ABRIR_METALMUEBLE_V23.bat
+├── iniciar_metalmueble.bat
 ├── MetalMueble_V23_COLAS_EN_CUADRICULA.txt
 ├── README.md
 ├── NOTICE.md
@@ -81,7 +81,7 @@ MetalMueble-MRP-II-FlexSim/
 ### Steps
 
 1. Close FlexSim if it is already open.
-2. Run `01_ABRIR_METALMUEBLE_V23.bat`.
+2. Run `iniciar_metalmueble.bat`.
 3. Wait for FlexSim to open and for the script to configure the model.
 4. Press **Run** once.
 5. Use FlexSim's fast-forward controls to observe the queues, processing stations, and finished-product accumulation.
