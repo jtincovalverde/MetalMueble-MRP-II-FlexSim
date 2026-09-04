@@ -1,16 +1,14 @@
-# MetalMueble MRP II — FlexSim 2027
+# MetalMueble MRP II — Simulación en FlexSim 2027
 
 [![Validación](https://github.com/jtincovalverde/MetalMueble-MRP-II-FlexSim/actions/workflows/validacion.yml/badge.svg)](https://github.com/jtincovalverde/MetalMueble-MRP-II-FlexSim/actions/workflows/validacion.yml)
 [![FlexSim](https://img.shields.io/badge/FlexSim-2027-2F6FED)](https://www.flexsim.com/)
 [![Python](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white)](https://www.python.org/)
 
-A portfolio case study that documents the **FlexSim implementation of an MRP II manufacturing-capacity scenario** for a fictitious metal-furniture company.
+Proyecto de simulación de manufactura desarrollado a partir de un caso académico de **MRP II y planeamiento de capacidad**. El objetivo es representar el recorrido de un lote de producción, observar la formación de colas y contrastar el comportamiento del sistema con el análisis de capacidad realizado previamente.
 
-> **Academic context:** the underlying MRP II case was developed as group coursework. This repository focuses on the FlexSim implementation, automation package, modeling logic, and technical validation used for the simulation component.
+> El caso general de MRP II fue desarrollado como trabajo grupal. Este repositorio reúne la parte de simulación, automatización, organización del modelo y validaciones técnicas utilizadas para presentar el proyecto.
 
-## What the model represents
-
-The simulated production flow is:
+## Proceso modelado
 
 ```mermaid
 flowchart LR
@@ -25,130 +23,89 @@ flowchart LR
     I --> J[Producto Terminado]
 ```
 
-The portfolio version models an initial lot of **420 units** over a **40-hour simulation horizon**. The configured processing times are:
+El escenario trabaja con un lote inicial de **420 unidades** y un horizonte de simulación de **40 horas**.
 
-| Work center | Process time |
+| Centro de trabajo | Tiempo de proceso |
 | --- | ---: |
-| Corte | 5.6976 min/unit |
-| Soldadura | 13.4723 min/unit |
-| Ensamble | 8.5046 min/unit |
-| Acabado | 10.4762 min/unit |
+| Corte | 5.6976 min/unidad |
+| Soldadura | 13.4723 min/unidad |
+| Ensamble | 8.5046 min/unidad |
+| Acabado | 10.4762 min/unidad |
 
-The expected operational behavior of the case is an accumulation before **Soldadura**, which is the slowest configured process and the intended bottleneck in the scenario.
+El comportamiento esperado es una mayor acumulación antes de **Soldadura**, que también aparece como el centro con mayor presión de capacidad en el análisis del caso.
 
-## What this repository demonstrates
+## Qué permite observar el modelo
 
-- Manufacturing-process modeling with **FlexSim 2027 Education**
-- Automated creation/configuration through **FlexScript**
-- Queue visualization and physical flow of work items
-- Controlled release of an initial lot of 420 items
-- Process-time and capacity configuration
-- KPI visualization for work-in-process, waiting time, throughput, and finished units
-- A Windows launcher that locates FlexSim and starts the model-building script
-- Static package validation through Python and GitHub Actions
+- Flujo físico de las piezas entre los centros de trabajo.
+- Formación y acumulación de colas.
+- Tiempo de espera antes de Soldadura.
+- Producción terminada durante el horizonte de simulación.
+- Throughput del sistema.
+- Identificación visual del cuello de botella.
+- Comparación entre la simulación y el análisis de capacidad.
 
-## Repository structure
+## Archivos principales
 
-```text
-MetalMueble-MRP-II-FlexSim/
-├── iniciar_metalmueble.bat
-├── modelo_metalmueble.txt
-├── README.md
-├── contexto.md
-├── .gitignore
-├── data/
-│   └── plan_capacidad.csv
-├── scripts/
-│   ├── analisis_capacidad.py
-│   └── validar_proyecto.py
-├── docs/
-│   ├── caso_estudio.md
-│   ├── diagnostico_tecnico.txt
-│   └── instrucciones.txt
-└── .github/
-    └── workflows/
-        └── validacion.yml
-```
+No es necesario revisar todo el repositorio para entender el proyecto. Los archivos más importantes son:
 
-## How to run it
+- **`iniciar_metalmueble.bat`** — abre FlexSim y prepara automáticamente el modelo.
+- **`modelo_metalmueble.txt`** — contiene la lógica de construcción y configuración del modelo.
+- **`data/plan_capacidad.csv`** — datos utilizados para contrastar carga y capacidad.
+- **`scripts/analisis_capacidad.py`** — reproduce el análisis numérico del caso.
+- **`scripts/validar_proyecto.py`** — comprueba que la configuración principal del proyecto se mantenga consistente.
+- **`docs/caso_estudio.md`** — resume el contexto académico y los resultados principales.
+- **`docs/instrucciones.txt`** — guía breve para ejecutar la simulación.
 
-### Requirements
+## Ejecutar la simulación
 
-- Windows 11 or another compatible Windows environment
-- Autodesk FlexSim 2027 / FlexSim 2027 Education
-- Internet access the first time the launcher needs to obtain the FlexSim seed model
+Se necesita **Windows** y una instalación compatible de **FlexSim 2027**.
 
-### Steps
+1. Cerrar FlexSim si ya está abierto.
+2. Ejecutar `iniciar_metalmueble.bat`.
+3. Esperar a que FlexSim cargue y configure el modelo.
+4. Pulsar **Ejecutar** una vez.
+5. Avanzar la simulación para observar las colas, los procesos y el producto terminado.
 
-1. Close FlexSim if it is already open.
-2. Run `iniciar_metalmueble.bat`.
-3. Wait for FlexSim to open and for the script to configure the model.
-4. Press **Run** once.
-5. Use FlexSim's fast-forward controls to observe the queues, processing stations, and finished-product accumulation.
+El lanzador busca la instalación local de FlexSim, prepara un modelo base y carga `modelo_metalmueble.txt` como script de configuración.
 
-The launcher copies the FlexScript file into a safe public folder, searches for the local FlexSim executable, obtains a seed model when needed, and launches FlexSim with the script path.
+## Análisis de capacidad
 
-## MRP II capacity context
+El caso compara la carga requerida con la capacidad disponible en Corte, Soldadura, Ensamble y Acabado. En el escenario base, **Soldadura requiere 77.85 h frente a 64.77 h disponibles**, por lo que se identifica como el centro sobrecargado.
 
-The FlexSim model belongs to a broader capacity-planning case. The deterministic analysis compares required workload with available capacity across Corte, Soldadura, Ensamble, and Acabado. In the base scenario, Soldadura requires **77.85 h** against **64.77 h** of available capacity, making it the overloaded work center.
-
-A compact dataset is included in `data/plan_capacidad.csv`, and the calculation can be reproduced with:
+El cálculo puede reproducirse con:
 
 ```bash
 python scripts/analisis_capacidad.py
 ```
 
-See [`docs/caso_estudio.md`](docs/caso_estudio.md) for the portfolio summary of the academic scenario.
+## Lógica del lote
 
-## Initial lot logic
+La primera pieza se crea en `t = 0` y las siguientes se liberan cada `0.06 s`. La creación se detiene al completar las **420 piezas**, por lo que el lote queda liberado aproximadamente durante los primeros **25.14 segundos simulados**.
 
-The Source is configured with a time-zero arrival and a short inter-arrival interval. The first item is created at `t = 0`; subsequent items are released every `0.06 s`. The OnExit logic stops creation after the 420th item, so the initial lot is released during approximately the first **25.14 simulated seconds**.
+La simulación se detiene automáticamente al alcanzar las **40 horas**.
 
-The reset trigger restores the original inter-arrival interval so the model can be reset and run again.
+## Visualización de colas
 
-## Queue visualization
+Las piezas se distribuyen dentro del área de cada cola en filas, columnas y capas. Esto evita que todo el inventario en proceso se vea como una única torre y permite apreciar mejor dónde se está acumulando trabajo.
 
-The queue layout is configured to keep work-in-process visually organized inside each queue area. Instead of stacking items in one vertical tower, queues use **Stack Inside Queue** placement so visible items occupy rows, columns, and additional layers inside the queue area.
+El mismo criterio se utiliza para el producto terminado.
 
-The same visual placement is used for the finished-product storage queue.
+## Indicadores visibles
 
-## KPIs included in the model
+El modelo incluye indicadores para:
 
-The script creates visual indicators for:
+- unidades terminadas;
+- contenido de la cola de Soldadura;
+- espera promedio antes de Soldadura;
+- throughput;
+- cuello de botella identificado.
 
-- Finished units
-- Content of the welding queue
-- Average waiting time before welding
-- Throughput
-- Identified bottleneck
+## Validación del proyecto
 
-These indicators are intended to make the simulation easier to explain during an operations / MRP II presentation.
+GitHub Actions ejecuta `scripts/validar_proyecto.py` cada vez que se actualiza el repositorio. Esta validación comprueba, entre otros puntos, el lote de 420 unidades, el horizonte de 40 horas, los tiempos de proceso, los nombres de los objetos principales y la presencia de los indicadores esperados.
 
-## Static validation
-
-Because FlexSim itself is not available in GitHub Actions, CI does **not** claim to execute or prove the simulation runtime. Instead, `scripts/validar_proyecto.py` performs static checks for the portfolio package, including:
-
-- expected 420-unit release logic
-- 40-hour stop time
-- required process-time values
-- required process objects and queue names
-- expected KPI definitions
-- absence of known problematic legacy references such as `Arrival1` and `creationtrigger`
-
-Run locally with:
-
-```bash
-python scripts/validar_proyecto.py
-```
-
-## Important limitation
-
-This repository documents the exact automation package and modeling configuration used in the portfolio version. FlexSim runtime behavior must still be verified inside a compatible FlexSim 2027 installation; the GitHub CI check is intentionally limited to static validation.
-
-## Model organization
-
-The current portfolio version keeps the documented process sequence, configured process times, initial lot logic, 40-hour horizon, KPI layer, and grid-style queue placement without exposing internal iteration numbers in the public file structure.
+Esta comprobación es **estática**. La ejecución visual y dinámica del modelo debe verificarse directamente dentro de FlexSim 2027.
 
 ---
 
-[Back to my GitHub profile](https://github.com/jtincovalverde)
+[Volver a mi perfil de GitHub](https://github.com/jtincovalverde)
