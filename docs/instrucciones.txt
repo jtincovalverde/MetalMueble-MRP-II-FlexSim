@@ -1,0 +1,11 @@
+INSTRUCCIONES DE EJECUCION
+
+1. Cierra FlexSim si ya esta abierto.
+2. Ejecuta iniciar_metalmueble.bat.
+3. Espera a que FlexSim prepare el modelo.
+4. Pulsa Ejecutar una sola vez.
+5. Usa los controles de avance para observar las colas y el producto terminado.
+
+El modelo libera 420 piezas durante aproximadamente los primeros 25.14 segundos
+simulados y mantiene un horizonte total de 40 horas. No es necesario modificar
+manualmente las propiedades del modelo para ejecutar el escenario documentado.
