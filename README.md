@@ -1,6 +1,6 @@
 # MetalMueble MRP II — FlexSim 2027
 
-[![Static validation](https://github.com/jtincovalverde/MetalMueble-MRP-II-FlexSim/actions/workflows/validate.yml/badge.svg)](https://github.com/jtincovalverde/MetalMueble-MRP-II-FlexSim/actions/workflows/validate.yml)
+[![Validación](https://github.com/jtincovalverde/MetalMueble-MRP-II-FlexSim/actions/workflows/validacion.yml/badge.svg)](https://github.com/jtincovalverde/MetalMueble-MRP-II-FlexSim/actions/workflows/validacion.yml)
 [![FlexSim](https://img.shields.io/badge/FlexSim-2027-2F6FED)](https://www.flexsim.com/)
 [![Python](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white)](https://www.python.org/)
 
@@ -52,22 +52,22 @@ The expected operational behavior of the case is an accumulation before **Soldad
 ```text
 MetalMueble-MRP-II-FlexSim/
 ├── iniciar_metalmueble.bat
-├── MetalMueble_V23_COLAS_EN_CUADRICULA.txt
+├── modelo_metalmueble.txt
 ├── README.md
-├── NOTICE.md
+├── contexto.md
 ├── .gitignore
 ├── data/
-│   └── capacity_plan.csv
+│   └── plan_capacidad.csv
 ├── scripts/
-│   ├── capacity_check.py
-│   └── validate_package.py
+│   ├── analisis_capacidad.py
+│   └── validar_proyecto.py
 ├── docs/
-│   ├── CASE_STUDY.md
-│   ├── DIAGNOSTICO_original.txt
-│   └── LEEME_original.txt
+│   ├── caso_estudio.md
+│   ├── diagnostico_tecnico.txt
+│   └── instrucciones.txt
 └── .github/
     └── workflows/
-        └── validate.yml
+        └── validacion.yml
 ```
 
 ## How to run it
@@ -92,13 +92,13 @@ The launcher copies the FlexScript file into a safe public folder, searches for 
 
 The FlexSim model belongs to a broader capacity-planning case. The deterministic analysis compares required workload with available capacity across Corte, Soldadura, Ensamble, and Acabado. In the base scenario, Soldadura requires **77.85 h** against **64.77 h** of available capacity, making it the overloaded work center.
 
-A compact dataset is included in `data/capacity_plan.csv`, and the calculation can be reproduced with:
+A compact dataset is included in `data/plan_capacidad.csv`, and the calculation can be reproduced with:
 
 ```bash
-python scripts/capacity_check.py
+python scripts/analisis_capacidad.py
 ```
 
-See [`docs/CASE_STUDY.md`](docs/CASE_STUDY.md) for the portfolio summary of the academic scenario.
+See [`docs/caso_estudio.md`](docs/caso_estudio.md) for the portfolio summary of the academic scenario.
 
 ## Initial lot logic
 
@@ -108,7 +108,7 @@ The reset trigger restores the original inter-arrival interval so the model can 
 
 ## Queue visualization
 
-This V23 version focuses on improving the visual behavior of queues. Instead of stacking items in one vertical tower, queues use **Stack Inside Queue** placement so visible items occupy rows, columns, and additional layers inside the queue area.
+The queue layout is configured to keep work-in-process visually organized inside each queue area. Instead of stacking items in one vertical tower, queues use **Stack Inside Queue** placement so visible items occupy rows, columns, and additional layers inside the queue area.
 
 The same visual placement is used for the finished-product storage queue.
 
@@ -126,7 +126,7 @@ These indicators are intended to make the simulation easier to explain during an
 
 ## Static validation
 
-Because FlexSim itself is not available in GitHub Actions, CI does **not** claim to execute or prove the simulation runtime. Instead, `scripts/validate_package.py` performs static checks for the portfolio package, including:
+Because FlexSim itself is not available in GitHub Actions, CI does **not** claim to execute or prove the simulation runtime. Instead, `scripts/validar_proyecto.py` performs static checks for the portfolio package, including:
 
 - expected 420-unit release logic
 - 40-hour stop time
@@ -138,20 +138,16 @@ Because FlexSim itself is not available in GitHub Actions, CI does **not** claim
 Run locally with:
 
 ```bash
-python scripts/validate_package.py
+python scripts/validar_proyecto.py
 ```
-
-The GitHub Actions workflow runs this static validator on pushes and pull requests. FlexSim runtime behavior is intentionally kept as a separate manual verification step.
 
 ## Important limitation
 
 This repository documents the exact automation package and modeling configuration used in the portfolio version. FlexSim runtime behavior must still be verified inside a compatible FlexSim 2027 installation; the GitHub CI check is intentionally limited to static validation.
 
-## Version
+## Model organization
 
-**V23 — Colas en cuadrícula**
-
-The principal change from the previous working version is visual queue placement; the package keeps the established process sequence, configured process times, initial lot logic, 40-hour horizon, and KPI layer.
+The current portfolio version keeps the documented process sequence, configured process times, initial lot logic, 40-hour horizon, KPI layer, and grid-style queue placement without exposing internal iteration numbers in the public file structure.
 
 ---
 
