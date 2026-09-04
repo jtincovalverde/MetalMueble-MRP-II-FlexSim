@@ -1,5 +1,9 @@
 # MetalMueble MRP II — FlexSim 2027
 
+[![Static validation](https://github.com/jtincovalverde/MetalMueble-MRP-II-FlexSim/actions/workflows/validate.yml/badge.svg)](https://github.com/jtincovalverde/MetalMueble-MRP-II-FlexSim/actions/workflows/validate.yml)
+[![FlexSim](https://img.shields.io/badge/FlexSim-2027-2F6FED)](https://www.flexsim.com/)
+[![Python](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+
 A portfolio case study that documents the **FlexSim implementation of an MRP II manufacturing-capacity scenario** for a fictitious metal-furniture company.
 
 > **Academic context:** the underlying MRP II case was developed as group coursework. This repository focuses on the FlexSim implementation, automation package, modeling logic, and technical validation used for the simulation component.
@@ -137,6 +141,8 @@ Run locally with:
 python scripts/validate_package.py
 ```
 
+The GitHub Actions workflow runs this static validator on pushes and pull requests. FlexSim runtime behavior is intentionally kept as a separate manual verification step.
+
 ## Important limitation
 
 This repository documents the exact automation package and modeling configuration used in the portfolio version. FlexSim runtime behavior must still be verified inside a compatible FlexSim 2027 installation; the GitHub CI check is intentionally limited to static validation.
@@ -146,3 +152,7 @@ This repository documents the exact automation package and modeling configuratio
 **V23 — Colas en cuadrícula**
 
 The principal change from the previous working version is visual queue placement; the package keeps the established process sequence, configured process times, initial lot logic, 40-hour horizon, and KPI layer.
+
+---
+
+[Back to my GitHub profile](https://github.com/jtincovalverde)
